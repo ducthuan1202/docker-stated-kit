@@ -1,0 +1,71 @@
+version: "3"
+
+# setup network
+networks: 
+  brian_network:
+    driver: bridge
+
+# setup services
+services:
+  brian_nginx: # service Nginx
+    image: nginx
+    ports:
+      - "8080:80"
+    container_name: brian_nginx
+    networks:
+      - brian_network
+    links:
+      - brian_php      
+    volumes:
+      - "./www:${DOCUMENT_ROOT}"
+      - "./config/nginx/default.conf:/etc/nginx/conf.d/default.conf"      
+  brian_php: # service PHP
+    image: ${PHP_VERSION}    
+    ports:
+      - "9000:9000"
+    container_name: brian_php
+    networks:
+      - brian_network
+    volumes:
+      - "./www:${DOCUMENT_ROOT}" 
+      - "./config/php/php.ini:/usr/local/etc/php/php.ini"
+  brian_mysql: # service MySQL
+    image: ${DATABASE}    
+    ports:
+      - "${MYSQL_PORT}:3306"
+    container_name: brian_mysql
+    networks:
+      - brian_network
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_ALLOW_EMPTY_PASSWORD}
+      MYSQL_RANDOM_ROOT_PASSWORD: ${MYSQL_RANDOM_ROOT_PASSWORD}
+    volumes:
+      - ${MYSQL_DATA_DIR-./data/mysql}:/var/lib/mysql
+      - ${MYSQL_LOG_DIR-./logs/mysql}:/var/log/mysql
+  brian_phpmyadmin: # service PhpMyadmin
+    image: phpmyadmin/phpmyadmin
+    container_name: brian_phpmyadmin
+    links:
+      - brian_mysql
+    environment:
+      PMA_HOST: database
+      PMA_PORT: 3306
+      PMA_USER: ${MYSQL_USER}
+      PMA_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_ALLOW_EMPTY_PASSWORD}
+      MYSQL_RANDOM_ROOT_PASSWORD: ${MYSQL_RANDOM_ROOT_PASSWORD}
+    ports:
+      - '8081:80'
+    volumes: 
+      - /sessions
+      - ${PHP_INI-./config/php/php.ini}:/usr/local/etc/php/conf.d/php-phpmyadmin.ini    
+
+  

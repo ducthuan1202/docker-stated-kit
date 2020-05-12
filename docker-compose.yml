@@ -1,0 +1,39 @@
+version: "3"
+# ################################## #
+# setup network
+# ################################## #
+networks: 
+  brian_network:
+    driver: bridge
+
+# setup services
+services:
+  # ################################## #
+  # service Nginx
+  # ################################## #
+  brian_nginx: 
+    image: nginx
+    ports:
+      - "8080:80"
+    container_name: brian_nginx
+    networks:
+      - brian_network
+    links:
+      - brian_php      
+    volumes:
+      - "./www:/var/www/html"
+      - "./site.conf:/etc/nginx/conf.d/default.conf"
+
+  # ################################## #
+  # service PHP
+  # ################################## #
+  brian_php: 
+    image: php:fpm    
+    ports:
+      - "9000:9000"
+    container_name: brian_php
+    networks:
+      - brian_network
+    volumes:
+      - "./www:/var/www/html"
+      - "./config/php/php.ini:/usr/local/etc/php/php.ini"
