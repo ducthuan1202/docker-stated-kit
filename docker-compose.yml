@@ -1,39 +1,29 @@
 version: "3"
-# ################################## #
-# setup network
-# ################################## #
-networks: 
-  brian_network:
-    driver: bridge
 
-# setup services
-services:
-  # ################################## #
-  # service Nginx
-  # ################################## #
+services: 
+  brian_php: 
+    build:
+      context: ./docker/php
+    container_name: brian_php
+    environment:
+      - APP_ENV=${APP_ENV}
+      - APP_SECRET=${APP_SECRET}
+      - KERNEL_CLASS=${KERNEL_CLASS}
+      - DATABASE_URL=${DATABASE_URL}            
+    volumes:
+      - ./source:/var/www
+
   brian_nginx: 
-    image: nginx
-    ports:
-      - "8080:80"
+    build: 
+      context: ./docker/nginx
     container_name: brian_nginx
-    networks:
-      - brian_network
-    links:
+    ports:
+      - "80:80"
+    depends_on:
       - brian_php      
     volumes:
-      - "./www:/var/www/html"
-      - "./site.conf:/etc/nginx/conf.d/default.conf"
-
-  # ################################## #
-  # service PHP
-  # ################################## #
-  brian_php: 
-    image: php:fpm    
-    ports:
-      - "9000:9000"
-    container_name: brian_php
-    networks:
-      - brian_network
-    volumes:
-      - "./www:/var/www/html"
-      - "./config/php/php.ini:/usr/local/etc/php/php.ini"
+      - ./source:/var/www
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/sites/:/etc/nginx/sites-available
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d
+      - ./logs:/var/log
