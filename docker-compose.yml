@@ -27,3 +27,38 @@ services:
       - ./docker/nginx/sites/:/etc/nginx/sites-available
       - ./docker/nginx/conf.d/:/etc/nginx/conf.d
       - ./logs:/var/log
+  
+  brian_mysql:
+    build:
+      context: ./docker/mysql
+    container_name: brian_mysql
+    restart: 'always'
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes: 
+      - volumes/mysql:/var/lib/mysql
+      - ./logs/mysql:/var/log/mysql      
+    environment:
+      MYSQL_ROOT_PASSWORD: admin@123
+      MYSQL_DATABASE: test
+      MYSQL_USER: root
+      MYSQL_PASSWORD: admin@123
+  
+  # brian_phpmyadmin:
+  #   build: 
+  #     context: ./docker/phpmyadmin
+  #   container_name: brian_phpmyadmin    
+  #   environment:
+  #     PMA_HOST: database
+  #     PMA_PORT: 3306
+  #     PMA_USER: admin@123
+  #     PMA_PASSWORD: admin@123
+  #     MYSQL_ROOT_PASSWORD: admin@123
+  #     MYSQL_DATABASE: test
+  #     MYSQL_USER: root
+  #     MYSQL_PASSWORD: admin@123
+  #   ports:
+  #     - "8080:80"
+  #   volumes: 
+  #     - /sessions
+  #     - ${PHP_INI-./config/php/php.ini}:/usr/local/etc/php/conf.d/php-phpmyadmin.ini
