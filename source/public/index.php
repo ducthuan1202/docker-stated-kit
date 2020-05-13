@@ -1,5 +1,8 @@
-<?php 
+<?php
+session_start();
 
-include "../app/common.php";
+$_rootPath = dirname(__DIR__);
 
-dd(array_get_value($_SERVER, 'REQUEST_URI', '/fdf'));
+include $_rootPath . "/vendor/autoload.php";
+
+\App\Service\Something::say();

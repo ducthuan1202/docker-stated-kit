@@ -1,0 +1,20 @@
+{
+  "name": "docker/php-nginx",
+  "type": "project",
+  "description": "php-nginx",
+  "keywords": ["php"],
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    },
+    "classmap": [],
+    "files": ["app/utils/helper.php"]
+  },
+  "require": {
+    "symfony/dotenv": "4.3"
+  },
+  "require-dev": {
+    "symfony/var-dumper": "4.3"
+  }
+}
